@@ -157,11 +157,22 @@ def writeFiles(summary, keyphrases, fileName):
 
 
 #retrieve each of the articles
-articles = os.listdir("articles")
+articles = os.listdir("a")
 for article in articles:
     print 'Reading articles/' + article
-    articleFile = open('articles/' + article, 'r')
-    text = articleFile.read()
+    articleFile = open('a/' + article, 'r')
+    text = articleFile.readlines()
+    T = ""
+
+    for line in text:
+        T+= line.strip().decode("ascii", "ignore")
+
+    print T
+
+    text = T
+    #text = text.decode("utf-8").strip()
+    #text = text.encode("ascii")
     keyphrases = extractKeyphrases(text)
     summary = extractSentences(text)
     writeFiles(summary, keyphrases, article)
+    #print text.strip()
