@@ -51,6 +51,28 @@ def lDistance(firstString, secondString):
         distances = newDistances
     return distances[-1]
 
+def sentenceLDistance(firstString, secondString):
+
+
+    s1 = firstString.split(" ")
+    s2 = secondString.split(" ")
+    len1 = len(s1)
+    len2 = len(s2)
+    x = [[0]*(len2+1) for _ in range(len1+1)]
+
+    for i in range(0, len1+1):
+        x[i][0] = i
+    for j in range(0, len2+1):
+        x[0][j] = j
+
+    for i in range(1, len1 + 1):
+        for j in  range(1, len2 + 1):
+            if s1[i-1] == s2[j-1]:
+                x[i][j] = x[i-1][j-1]
+            else:
+                x[i][j] = min(x[i][j-1], x[i-1][j],x[i-1][j-1])+1
+    print x[i][j]
+
 def buildGraph(nodes):
     "nodes - list of hashables that represents the nodes of the graph"
     gr = nx.Graph() #initialize an undirected graph
@@ -155,7 +177,7 @@ def writeFiles(summary, keyphrases, fileName):
 
     print "-"
 
-
+'''
 #retrieve each of the articles
 articles = os.listdir("a")
 for article in articles:
@@ -176,3 +198,8 @@ for article in articles:
     summary = extractSentences(text)
     writeFiles(summary, keyphrases, article)
     #print text.strip()
+'''
+a = "what is your name my friend"
+b = "what is name"
+
+sentenceLDistance(a,b)
