@@ -36,57 +36,30 @@ def unique_everseen(iterable, key=None):
                 seen_add(k)
                 yield element
 
-def lDistance(firstString, secondString):
-    "Function to find the Levenshtein distance between two words/sentences - gotten from http://rosettacode.org/wiki/Levenshtein_distance#Python"
-    if len(firstString) > len(secondString):
-        firstString, secondString = secondString, firstString
-    distances = range(len(firstString) + 1)
-    for index2, char2 in enumerate(secondString):
-        newDistances = [index2 + 1]
-        for index1, char1 in enumerate(firstString):
-            if char1 == char2:
-                newDistances.append(distances[index1])
-            else:
-                newDistances.append(1 + min((distances[index1], distances[index1+1], newDistances[-1])))
-        distances = newDistances
-    return distances[-1]
-
-def sentenceLDistance(firstString, secondString):
-
-
-    s1 = firstString.split(" ")
-    s2 = secondString.split(" ")
-    len1 = len(s1)
-    len2 = len(s2)
-    x = [[0]*(len2+1) for _ in range(len1+1)]
-
-    for i in range(0, len1+1):
-        x[i][0] = i
-    for j in range(0, len2+1):
-        x[0][j] = j
-
-    for i in range(1, len1 + 1):
-        for j in  range(1, len2 + 1):
-            if s1[i-1] == s2[j-1]:
-                x[i][j] = x[i-1][j-1]
-            else:
-                x[i][j] = min(x[i][j-1], x[i-1][j],x[i-1][j-1])+1
-    print x[i][j]
-
-def buildGraph(nodes):
+def buildGraph(nodes,Type):
     "nodes - list of hashables that represents the nodes of the graph"
     gr = nx.Graph() #initialize an undirected graph
     gr.add_nodes_from(nodes)
     nodePairs = list(itertools.combinations(nodes, 2))
 
     #add edges to the graph (weighted by Levenshtein distance)
-    for pair in nodePairs:
-        firstString = pair[0]
-        secondString = pair[1]
-        levDistance = lDistance(firstString, secondString)
-        gr.add_edge(firstString, secondString, weight=levDistance)
 
-    return gr
+    if(Type == 'word'):
+        for pair in nodePairs:
+            firstString = pair[0]
+            secondString = pair[1]
+            levDistance = nltk.metrics.edit_distance(firstString, secondString)
+            gr.add_edge(firstString, secondString, weight=levDistance)
+        return gr
+    elif(Type == 'sentence'):
+        for pair in nodePairs:
+            firstString = pair[0]
+            secondString = pair[1]
+            levDistance = nltk.metrics.edit_distance(firstString.split(), secondString.split())
+            gr.add_edge(firstString, secondString, weight=levDistance)
+        return gr
+    else:
+	print("Invalid Type")
 
 def extractKeyphrases(text):
     #tokenize the text using nltk
@@ -104,7 +77,7 @@ def extractKeyphrases(text):
 
    #this will be used to determine adjacent words in order to construct keyphrases with two words
 
-    graph = buildGraph(word_set_list)
+    graph = buildGraph(word_set_list,'word')
 
     #pageRank - initial value of 1.0, error tolerance of 0,0001, 
     calculated_page_rank = nx.pagerank(graph, weight='weight')
@@ -147,7 +120,7 @@ def extractKeyphrases(text):
 def extractSentences(text):
     sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
     sentenceTokens = sent_detector.tokenize(text.strip())
-    graph = buildGraph(sentenceTokens)
+    graph = buildGraph(sentenceTokens,'sentence')
 
     calculated_page_rank = nx.pagerank(graph, weight='weight')
 
@@ -167,39 +140,25 @@ def writeFiles(summary, keyphrases, fileName):
     print "Generating output to " + 'keywords/' + fileName
     keyphraseFile = open('keywords/' + fileName, 'w')
     for keyphrase in keyphrases:
+	keyphrase = keyphrase.encode("utf-8","ignore")
         keyphraseFile.write(keyphrase + '\n')
     keyphraseFile.close()
 
     print "Generating output to " + 'summaries/' + fileName
     summaryFile = open('summaries/' + fileName, 'w')
+    summary = summary.encode("utf-8","ignore")
     summaryFile.write(summary)
     summaryFile.close()
 
     print "-"
 
-'''
 #retrieve each of the articles
-articles = os.listdir("a")
+articles = os.listdir("articles")
 for article in articles:
     print 'Reading articles/' + article
-    articleFile = open('a/' + article, 'r')
-    text = articleFile.readlines()
-    T = ""
-
-    for line in text:
-        T+= line.strip().decode("ascii", "ignore")
-
-    print T
-
-    text = T
-    #text = text.decode("utf-8").strip()
-    #text = text.encode("ascii")
+    articleFile = open('articles/' + article, 'r')
+    text = articleFile.read()
+    text = text.decode("utf-8","ignore")
     keyphrases = extractKeyphrases(text)
     summary = extractSentences(text)
     writeFiles(summary, keyphrases, article)
-    #print text.strip()
-'''
-a = "what is your name my friend"
-b = "what is name"
-
-sentenceLDistance(a,b)
