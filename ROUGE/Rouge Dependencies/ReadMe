@@ -1,0 +1,29 @@
+Check for Perl version. 
+perl -v
+Needs to be higher than 5.6.0
+
+Run the following commands from this directory
+
+tar -zxvf XML-RegExp-0.04.tar.gz
+cd XML-RegExp-0.04
+perl MakeFile.pl
+make
+make test
+sudo make install
+cd ..
+
+tar -zxvf libxml-perl-0.08.tar.gz
+cd libxml-perl-0.08
+perl MakeFile.pl
+make
+make test
+sudo make install
+cd ..
+
+tar -zxvf XML-DOM-1.44.tar.gz
+cd XML-DOM-1.44
+perl MakeFile.pl
+make
+make test
+sudo make install
+cd ..
