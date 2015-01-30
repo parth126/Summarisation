@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[co]
+*.egg-info
+
+# tests
+.coverage
+
+# working folders
+/experiments/
+
+# IDE files
+.idea
