@@ -1,0 +1,227 @@
+A simplified guide to use ROUGE
+by Parth Mehta 
+IR-LAB, DA-IICT, Gandhinagar
+01-February-2015
+
+(Most points directly borrowed from the original ReadMe
+A Brief Introduction of the ROUGE Summary Evaluation Package by Chin-Yew LIN. 
+Just rearranged in a more intuitive and readable manner)
+
+----------------------------------------
+Setting Up ROUGE
+----------------------------------------
+
+(1) Check for Perl version. 
+    perl -v
+    Needs to be higher than 5.6.0
+
+(2) Install a few dependencies available at http://www.cpan.org
+
+    - XML::SAX2Perl
+      tar -zxvf libxml-perl-0.08.tar.gz
+      cd libxml-perl-0.08
+      perl MakeFile.pl
+      make
+      make test
+      sudo make install
+      cd ..
+    
+    - XML::RegEXP
+      tar -zxvf XML-RegExp-0.04.tar.gz
+      cd XML-RegExp-0.04
+      perl MakeFile.pl
+      make
+      make test
+      sudo make install
+      cd ..
+
+    - XML::DOM 
+      tar -zxvf XML-DOM-1.44.tar.gz
+      cd XML-DOM-1.44
+      perl MakeFile.pl
+      make
+      make test
+      sudo make install
+      cd ..
+
+(3) Setup an environment variable ROUGE_EVAL_HOME that points to the
+    "data" subdirectory. For example, if your "data" subdirectory
+    located at "/usr/local/ROUGE-1.5.4/data" then you can setup
+    the ROUGE_EVAL_HOME as follows:
+    
+    (a) Using csh or tcsh:
+        setenv ROUGE_EVAL_HOME /usr/local/ROUGE-1.5.4/data
+    (b) Using bash
+        ROUGE_EVAL_HOME=/usr/local/ROUGE-1.5.4/data
+	export ROUGE_EVAL_HOME
+
+(4) Run ROUGE-1.5.4.pl without supplying any arguments will give
+    you a description of how to use the ROUGE script.
+
+----------------------------------------
+Known Issues
+----------------------------------------
+
+(1) You need to have DB_File installed. If the Perl script complains
+    about database version incompatibility, you can create a new
+    WordNet-2.0.exc.db by running the buildExceptionDB.pl script in
+    the "data/WordNet-2.0-Exceptions" subdirectory.
+
+----------------------------------------
+Checking the installation
+----------------------------------------
+
+Sample DUC2002 data (1 system and 1 model only per DUC 2002 topic), their BE and
+ROUGE evaluation configuration file in XML and file list format,
+and their expected output are also included for your reference.
+
+    (a) Use DUC2002-BE-F.in.26.lst, a BE files list, as ROUGE the
+        configuration file:
+        command> ROUGE-1.5.4.pl -3 HM -z SIMPLE DUC2002-BE-F.in.26.lst 26
+	output:  DUC2002-BE-F.in.26.lst.out
+    (b) Use DUC2002-BE-F.in.26.simple.xml as ROUGE XML evaluation configuration file:
+        command> ROUGE-1.5.4.pl -3 HM DUC2002-BE-F.in.26.simple.xml 26
+	output:  DUC2002-BE-F.in.26.simple.out
+    (c) Use DUC2002-BE-L.in.26.lst, a BE files list, as ROUGE the
+        configuration file:
+        command> ROUGE-1.5.4.pl -3 HM -z SIMPLE DUC2002-BE-L.in.26.lst 26
+	output:  DUC2002-BE-L.in.26.lst.out
+    (d) Use DUC2002-BE-L.in.26.simple.xml as ROUGE XML evaluation configuration file:
+        command> ROUGE-1.5.4.pl -3 HM DUC2002-BE-L.in.26.simple.xml 26
+	output:  DUC2002-BE-L.in.26.simple.out
+    (e) Use DUC2002-ROUGE.in.26.spl.lst, a BE files list, as ROUGE the
+        configuration file:
+        command> ROUGE-1.5.4.pl -n 4 -z SPL DUC2002-ROUGE.in.26.spl.lst 26
+	output:  DUC2002-ROUGE.in.26.spl.lst.out
+    (f) Use DUC2002-ROUGE.in.26.spl.xml as ROUGE XML evaluation configuration file:
+        command> ROUGE-1.5.4.pl -n 4 DUC2002-ROUGE.in.26.spl.xml 26
+	output:  DUC2002-ROUGE.in.26.spl.out
+
+Check the .out files prodices by these commands with the corresponding .out files provided in the sample-output file.
+If the results are similar then the installation is okay and you can proceed further.
+
+----------------------------------------
+Using ROUGE
+----------------------------------------
+
+Use "-h" option to see a list of options.
+    
+Usage: ROUGE-1.5.4.pl [<options>] <ROUGE-eval-config-file> [<systemID>]
+
+
+ROUGE-eval-config-file: Specify the evaluation setup. Three files come with the ROUGE 
+            		evaluation package, i.e. ROUGE-test.xml, verify.xml, and verify-spl.xml are 
+            		good examples.
+
+systemID:		Specify which system in the ROUGE-eval-config-file to perform the evaluation.
+            		If '-a' option is used, then all systems are evaluated and users do not need to
+            		provide this argument.
+
+Options: 		Following is the list of available options
+
+## What to evaluate and display         
+         [-a (evaluate all systems)]         % If -a is not specified then a systemID has to be specified after <ROUGE-eval-config-file>
+         [-d]				     % This prints evaluation result for each file of a system separately.
+
+## Preprocessing options
+         [-s]				     % Remove stopwords in model and system summaries before computing various statistics. 
+         [-m]				     % Stem both model and system summaries using Porter stemmer before computing various statistics.  
+
+## Type of ROUGE to be used (multiple allowed, ROUGE-L calculated by default unless -x specified)
+         [-2 max-gap-length]                 % Compute ROUGE-S with maximum max-gap-length  (if < 0 then no gap length limit)
+         [-u]				     % Include unigram in ROUGE-S (-2 has to be specified) 
+         [-U]				     % Same as -u but also computes the normal (without unigram) ROUGE-S separately.  
+         [-n max-ngram] 		     % Computing ROUGE-N with maximum max-ngram length
+         [-w weight]			     % Compute ROUGE-W with weight as a weighting factor for WLCS.
+	 [-x]				     % Do not calculate ROUGE-L
+
+## Evaluation parameters           
+         [-c cf]			     % What confidence interval to use      
+         [-p alpha]			     % Relative importance of precision and recall. (0 <= alpha <=1)
+         [-f A|B]		             % Select scoring formula: 'A' => model average; 'B' => best model
+         [-b n-bytes| -l n-words]  	     % Use only first n-bytes/n-words of each summary for evaluation
+         [-t 0|1|2] 			     % Compute average ROUGE by averaging over the whole test corpus instead of sentences (units).
+        				       0: use sentence as counting unit
+					       1: use token as couting unit
+					       2: same as 1 but output raw counts instead of precision, recall, and f-measure scores. 
+
+## Other options
+         [-r number-of-samples]		     % Specify the number of sampling point in bootstrap resampling (default is 1000).
+    					       Smaller number will speed up the evaluation but less reliable confidence interval. 
+         [-z <SEE|SPL|ISI|SIMPLE>]           % ROUGE-eval-config-file is a list of peer-model pair per line instead of xml file. 
+					       The files can be of any of the four specified format (SEE|SPL|ISI|SIMPLE).
+         [-e ROUGE_EVAL_HOME] 		     % Specify ROUGE_EVAL_HOME directory where the ROUGE data files can be found.
+					       This will overwrite the ROUGE_EVAL_HOME specified in the environment variable.
+         [-h]	 			     % Print usage information
+         [-v]				     % Print debugging information for diagnositic purpose 
+         [-3 <H|HM|HMR|HM1|HMR1|HMR2>]       % Compute BE score.
+				               H    -> head only scoring (does not applied to Minipar-based BEs).
+       					       HM   -> head and modifier pair scoring.
+        				       HMR  -> head, modifier and relation triple scoring.
+      					       HM1  -> H and HM scoring (same as HM for Minipar-based BEs).
+ 					       HMR1 -> HM and HMR scoring (same as HMR for Minipar-based BEs).
+ 					       HMR2 -> H, HM and HMR scoring (same as HMR for Minipar-based BEs).
+
+## Default Parameters:
+    
+When running ROUGE without supplying any options (except -a), the following defaults are used:
+
+    (1) ROUGE-L is computed;
+    (2) 95% confidence interval;
+    (3) No stemming;
+    (4) Stopwords are inlcuded in the calculations;
+    (5) ROUGE looks for its data directory first through the ROUGE_EVAL_HOME environment variable. If
+        it is not set, the current directory is used.
+    (6) Use model average scoring formula.
+    (7) Assign equal importance of ROUGE recall and precision in computing ROUGE f-measure, i.e. alpha=0.5.
+    (8) Compute average ROUGE by averaging sentence (unit) ROUGE scores.
+
+-----------------------------------
+Setup a ROUGE-Eval-config-file
+-----------------------------------
+
+    (a) A simple file containing a two column list of peer(the file to be evaluated) file 
+        and the coresponding model (gold standard summary) file.
+
+    (b) A xml file containing the information of perr files and corresponding model files. Here each document can have multiple peers
+	(each peer corresponds to a summary of the document generated by a particular system) as well as multiple models (each model
+	corresponds to a gold standard summary of the document). 
+
+	Explanation fo tags
+
+	  - <EVAL ID="1"> </EVAL>	Contains entire info about one particular document. Includes the following
+	  - <PEER-ROOT>			Path to the folder containing peers(summaries generated by different systems) of this document. 
+	  - <MODEL-ROOT>		Path to the folder containing models(gold standard summaries) of this document.
+	  - <INPUT-FORMAT TYPE="SEE">	Specifies the format of the input documents. Can be SEE, SPL, ISI or SIMPLE
+	  - <PEERS>			Contains list of peers in the format <P ID="C">peer1.html</P>
+	  - <MODELS>			Contains list of peers in the format <M ID="C">model1.html</M>
+
+----------------------------------------
+Related Reading
+----------------------------------------
+
+(1) Please look into the "docs" directory for more information about
+    ROUGE.
+(2) ROUGE-Note-v1.4.2.pdf explains how ROUGE works. It was published in
+    Proceedings of the Workshop on Text Summarization Branches Out
+    (WAS 2004), Bacelona, Spain, 2004.
+(3) NAACL2003.pdf presents the initial idea of applying n-gram
+    co-occurrence statistics in automatic evaluation of
+    summarization. It was publised in Proceedsings of 2003 Language
+    Technology Conference (HLT-NAACL 2003), Edmonton, Canada, 2003.
+(4) NTCIR2004.pdf discusses the effect of sample size on the
+    reliability of automatic evaluation results using data in the past
+    Document Understanding Conference (DUC) as examples. It was
+    published in Proceedings of the 4th NTCIR Meeting, Tokyo, Japan, 2004.
+(5) ACL2004.pdf shows how ROUGE can be applied on automatic evaluation
+    of machine translation. It was published in Proceedings of the 42nd
+    Annual Meeting of the Association for Computational Linguistics
+    (ACL 2004), Barcelona, Spain, 2004.
+(6) COLING2004.pdf proposes a new meta-evaluation framework, ORANGE, for
+    automatic evaluation of automatic evaluation methods. We showed
+    that ROUGE-S and ROUGE-L were significantly better than BLEU,
+    NIST, WER, and PER automatic MT evalaution methods under the
+    ORANGE framework. It was published in Proceedings of the 20th
+    International Conference on Computational Linguistics (COLING 2004),
+    Geneva, Switzerland, 2004.
+
