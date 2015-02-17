@@ -28,7 +28,7 @@ $VERSION = "3.07";
 
 # NOTE: this is the ONLY place where the path to MEAD should be hardcoded.
 
-$MEADDIR = "/data0/projects/mead311/mead";
+$MEADDIR = "/home/irlab-parth/Summarisation/mead";
 
 # I don't know what we're going to use these for.
 $DEBUG = 0;

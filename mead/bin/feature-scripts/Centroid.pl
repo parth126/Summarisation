@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 #
 # usage: echo cluster_file_name | Centroid.pl <idffile> (ENG|CHIN) <datadir>
 #

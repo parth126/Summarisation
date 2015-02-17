@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 # TODO: AJW
 # MEAD::Config::read_meadconfig(\*IN);

@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 #
 # usage: echo cluster_file query_file | Skeleton.pl <datadir>
